@@ -2,10 +2,10 @@ export const program = {
   help: () => {
     console.log('\nDiscord CLI - Terminal Discord Client\n');
     console.log('Commands:');
-    console.log('  discord-cli chat          Start Discord chat interface (DMs and channels)');
-    console.log('  discord-cli server        Start Discord server browser (servers and channels)');
-    console.log('  discord-cli --help       Show this help message');
-    console.log('  discord-cli -h           Show this help message\n');
+    console.log('  npm run dm          Start Discord chat interface (DMs)');
+    console.log('  npm run server        Start Discord server browser (servers and channels)');
+    console.log('  npm run help       Show this help message');
+    console.log('  npm run -h          Show this help message\n');
   }
 };
 

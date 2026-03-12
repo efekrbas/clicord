@@ -10,10 +10,26 @@ import chalk from 'chalk';
 const args = process.argv.slice(2);
 
 if (args.length === 0) {
+  const quotes = [
+    "Discord, stripped of the bloat.",
+    "No nitro, no stickers, just messages.",
+    "The quietest way to use Discord.",
+    "Read the chat. Ignore the noise.",
+    "Your Discord, terminal-fied.",
+    "Discord at the speed of thought.",
+    "All your servers, one terminal away.",
+    "Bye bye Electron. Hello performance.",
+    "Focus on the text. Forget the icons.",
+    "Discord: Keyboard-only edition.",
+    "Navigate your servers like a pro.",
+    "Piping Discord directly to your TTY."
+  ];
+  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
   // Logo ve hoş geldin mesajı göster
   showLogo();
-  console.log(chalk.white('\nThe end of brainrot and doomscrolling is here.'));
-  console.log(chalk.white("Type 'discord-cli --help' to see available commands."));
+  console.log(chalk.white(`\n${randomQuote}`));
+  console.log(chalk.white("Type 'npm run help' to see available commands."));
   console.log(chalk.white("Pro Tip: Use vim-motion ('k', 'j') to navigate chats and messages."));
   process.exit(0);
 }

@@ -9,7 +9,9 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dm": "node index.js dm"
+    "dm": "node index.js dm",
+    "server": "node index.js server",
+    "help": "node index.js --help"
   },
   "keywords": [
     "discord",

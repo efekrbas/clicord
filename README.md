@@ -1,6 +1,6 @@
 # Discord CLI
 
-A terminal-based Discord chat interface. Allows you to use Discord in the terminal.
+A terminal-based Discord chat interface. Allows you to use Discord directly from your terminal, stripped of the bloat.
 
 ## Images
 
@@ -11,44 +11,45 @@ A terminal-based Discord chat interface. Allows you to use Discord in the termin
 <img width="1919" height="1078" alt="image" src="https://github.com/user-attachments/assets/78923953-390f-4f86-8d2f-b0ebe176b7cb" />
 <img width="1919" height="1001" alt="image" src="https://github.com/user-attachments/assets/cddff206-4e64-4177-8d97-0d2313e40ba3" />
 
-
-
 ## Features
 
-- 🎨 Modern terminal interface
-- 💬 Real-time messaging
-- 🔔 Real-time notifications for new messages (per-user/channel)
-- ⌨️ Vim-style navigation (k, j keys) and arrow keys
-- 🖼️ Image, file, and sticker support
-- 📎 File upload support
-- 📌 Pin messages
-- ❤️ React to messages
-- ✏️ Edit and delete messages
-- 💬 Reply to messages
-- 🚀 Fast and lightweight
+- 🎨 **Modern terminal interface**: Clean and minimal UI.
+- 💬 **Real-time messaging**: Chat with zero lag.
+- 🔔 **Real-time notifications**: Stay updated on new messages (per-user/channel).
+- ⌨️ **Vim-style navigation**: Use `k`, `j` keys or arrow keys to navigate effortlessly.
+- 🖼️ **Media support**: View images, files, and stickers explicitly.
+- 📎 **File upload**: Easily upload files directly from the CLI.
+- 📌 **Pin messages**: Keep important messages accessible.
+- ❤️ **Reactions**: React to messages seamlessly.
+- ✏️ **Message management**: Edit and delete your own messages.
+- 💬 **Replies**: Reply directly to specific messages.
+- 🎲 **Random Welcome Quotes**: Enjoy a fresh, bloat-free quote every time you start the app.
+- 🚀 **Fast and lightweight**: Bye bye Electron. Hello performance.
 
 ## Installation
 
-1. Clone or download the project
-2. Install dependencies:
+1. Clone or download the project repository.
+2. Install the necessary dependencies:
 ```bash
 npm install
 ```
 
-3. Add your token to the `.env` file
+3. Setup your environment variables:
+- **Windows**: Run `setup_env.bat` to automatically create the `.env` file. Open the created file and paste your token after the `=` sign.
+- **Manual**: Create a `.env` file in the root directory and add your token:
 ```
 DISCORD_USER_TOKEN=your_user_token_here
 ```
 
-### How to Get Your Discord User Token?
+### How to Get Your Discord User Token
 
-- https://youtu.be/rcwWex7aqTo (If you don't know how to get it, watch this video.)
+- Watch this [tutorial video](https://youtu.be/rcwWex7aqTo) if you don't know how to obtain your user token.
 
-**Important Notes:**
-- Never share your user token!
-- Your token grants full access to your account
-- If your token is compromised, change your account immediately
-- Using self-bots may be prohibited under Discord's ToS; use at your own risk
+**⚠️ Important Security Notes:**
+- **Never share your user token with anyone!**
+- Your token grants full access to your entire Discord account.
+- If you suspect your token is compromised, change your Discord password immediately to reset it.
+- *Disclaimer: Using self-bots may be prohibited under Discord's Terms of Service. Use this application at your own risk.*
 
 ## Usage
 
@@ -57,67 +58,55 @@ DISCORD_USER_TOKEN=your_user_token_here
 npm run dm
 ```
 
-or
-
-```bash
-node index.js dm
-```
-
 ### Start server browser (servers, categories, and channels):
 ```bash
-node index.js server
+npm run server
 ```
 
-### Help:
+### Show Help / Available Commands:
 ```bash
-node index.js --help
+npm run help
 ```
 
 ## Keyboard Shortcuts
 
-- `Esc`: Exit
-- `Ctrl+D`: Clear input box
-- `j`, `k` or `Up`, `Down`: Navigate between messages (vim-style or arrow keys)
-- `Enter`: Send message
+- `Esc`: Exit the application or view
+- `Ctrl+D`: Clear the input box
+- `j`, `k` or `Up`, `Down`: Navigate between messages or lists
+- `Enter`: Send message or select an item
 
-## Commands
+## CLI Commands within Chat
 
-- `/upload <file_path>`: Upload a file to the channel
-- `/view <message_id>`: Open file/image/sticker in browser
-- `/reply <message_id> <message>`: Reply to a message
-- `/r <message_id> <message>`: Reply to a message (short form)
-- `/edit <message_id> <new_message>`: Edit a message (only your own messages)
-- `/delete <message_id>`: Delete a message (only your own messages)
-- `/pin <message_id>`: Pin a message
+- `/upload <file_path>`: Upload a file to the current channel
+- `/view <message_id>`: Open a file/image/sticker in your default web browser
+- `/reply <message_id> <message>`: Reply to a specific message
+- `/r <message_id> <message>`: Quick reply to a message
+- `/edit <message_id> <new_message>`: Edit your own message
+- `/delete <message_id>`: Delete your own message
+- `/pin <message_id>`: Pin a message to the channel
 - `/react <message_id> <emoji>`: Add a reaction to a message
-- `/help`: Show available commands
+- `/help`: Show all available commands in the chat interface
 
 ### File Upload Examples
 ```bash
 # Upload a single file
 /upload C:\Users\username\Desktop\image.png
 
-# Upload file with spaces in path
+# Upload a file with spaces in the path (use quotes)
 /upload "C:\Users\username\My Documents\file.pdf"
 ```
 
 ### Message ID Format
-- Message IDs are displayed in yellow color within blue parentheses
-- File/Sticker names are displayed in yellow within blue brackets
-- Example: `[File: filename.png] (1455312755623067821)` 
-- Sticker Example: `[Sticker: StickerName] (1455312755623067822)`
+- Message IDs are displayed in **yellow color within blue parentheses**.
+- File and Sticker names are displayed in **yellow within blue brackets**.
+- **File Example**: `[File: filename.png] (1455312755623067821)` 
+- **Sticker Example**: `[Sticker: StickerName] (1455312755623067822)`
 
 ## Requirements
 
-- Node.js 18+ 
-- Discord User Token
-
-## Notes
-
-- Never share your user token
-- You connect via your own account using the user token
-- According to Discord's ToS, self-bot usage may be prohibited; use at your own risk
+- Node.js version 18 or higher
+- A valid Discord User Token
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
