@@ -34,10 +34,9 @@ function safeEmoji(text) {
 export async function startServer(selectedToken = null) {
   console.log(chalk.cyan('\nStarting Discord Server Browser...\n'));
 
-  const token = selectedToken || process.env.DISCORD_USER_TOKEN;
+  const token = selectedToken;
   if (!token) {
-    console.error(chalk.red('HATA: DISCORD_USER_TOKEN environment variable bulunamadı!'));
-    console.log(chalk.yellow('\nLütfen .env dosyası oluşturup DISCORD_USER_TOKEN değerini ekleyin.'));
+    console.error(chalk.red('HATA: Giriş için geçerli bir token bulunamadı!'));
     process.exit(1);
   }
 

@@ -110,12 +110,6 @@ async function getValidAccounts() {
     const tokens = extractTokens();
     const accounts = [];
     
-    // Check .env token as well
-    dotenv.config();
-    if (process.env.DISCORD_USER_TOKEN && !tokens.includes(process.env.DISCORD_USER_TOKEN)) {
-        tokens.unshift(process.env.DISCORD_USER_TOKEN); // Put env token first
-    }
-    
     for (const token of tokens) {
         const user = await fetchUser(token);
         if (user) {
@@ -200,7 +194,7 @@ async function getTokenInteractive() {
     
     if (accounts.length === 0) {
         console.error(chalk.red('HATA: Hiçbir Discord hesabı bulunamadı!'));
-        console.log(chalk.yellow('Lütfen .env dosyası oluşturup DISCORD_USER_TOKEN değerini ekleyin veya Discord uygulamalarından birine giriş yapın.'));
+        console.log(chalk.yellow('Lütfen bilgisayarınızdaki Discord uygulamalarından (Stable, Canary, PTB) birine giriş yapın.'));
         process.exit(1);
     }
     

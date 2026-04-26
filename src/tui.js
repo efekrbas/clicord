@@ -31,10 +31,9 @@ let focusArea = 'sidebar';
 export async function startTUI(selectedToken = null) {
   console.log(chalk.cyan('\n  Starting clicord...\n'));
 
-  const token = selectedToken || process.env.DISCORD_USER_TOKEN;
+  const token = selectedToken;
   if (!token) {
-    console.error(chalk.red('ERROR: DISCORD_USER_TOKEN not found!'));
-    console.log(chalk.yellow('Please create a .env file and add DISCORD_USER_TOKEN.'));
+    console.error(chalk.red('HATA: Giriş için geçerli bir token bulunamadı!'));
     process.exit(1);
   }
 

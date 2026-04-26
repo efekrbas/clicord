@@ -30,18 +30,6 @@ npm install
 
 3. You're ready to go! `clicord` will automatically grab your tokens from your active Discord desktop applications (Stable, Canary, PTB) and prompt you to select an account.
 
-### Manual Token Entry (Optional)
-
-If you don't have the Discord desktop app installed or want to use a specific account, you can manually setup a `.env` file:
-- **Windows**: Run `setup_env.bat` to automatically create the `.env` file. Open the created file and paste your token after the `=` sign.
-- **Manual**: Create a `.env` file in the root directory and add your token:
-```
-DISCORD_USER_TOKEN=your_user_token_here
-```
-
-#### How to Get Your Discord User Token Manually
-- Watch this [tutorial video](https://youtu.be/rcwWex7aqTo) if you don't know how to obtain your user token.
-
 **⚠️ Important Security Notes:**
 - **Never share your user token with anyone!**
 - Your token grants full access to your entire Discord account.
