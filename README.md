@@ -9,7 +9,7 @@ A terminal-based Discord chat interface. Allows you to use Discord directly from
 - 🚥 **User Presence Status**: View online (🟢), DND (🔴), idle (🟠), and offline (⚪) statuses for friends directly in your DM list.
 - 📦 **Rich Embed Support**: View formatted bot messages and rich embeds right inside your terminal.
 - 🔔 **Real-time notifications**: Stay updated on new messages (per-user/channel).
-- ⌨️ **Vim-style navigation**: Use `k`, `j` keys or arrow keys to navigate effortlessly.
+- ⌨️ **Vim-style navigation**: Use `k`, `j` keys or  `up`,`down` arrow keys to navigate effortlessly.
 - 🖼️ **Media support**: View images, files, and stickers explicitly.
 - 📎 **File upload**: Easily upload files directly from the CLI.
 - 📌 **Pin messages**: Keep important messages accessible.
