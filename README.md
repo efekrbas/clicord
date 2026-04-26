@@ -1,4 +1,4 @@
-# Discord CLI
+# clicord
 
 A terminal-based Discord chat interface. Allows you to use Discord directly from your terminal, stripped of the bloat.
 
@@ -15,6 +15,8 @@ A terminal-based Discord chat interface. Allows you to use Discord directly from
 
 - 🎨 **Modern terminal interface**: Clean and minimal UI.
 - 💬 **Real-time messaging**: Chat with zero lag.
+- 🚥 **User Presence Status**: View online (🟢), DND (🔴), idle (🟠), and offline (⚪) statuses for friends directly in your DM list.
+- 📦 **Rich Embed Support**: View formatted bot messages and rich embeds right inside your terminal.
 - 🔔 **Real-time notifications**: Stay updated on new messages (per-user/channel).
 - ⌨️ **Vim-style navigation**: Use `k`, `j` keys or arrow keys to navigate effortlessly.
 - 🖼️ **Media support**: View images, files, and stickers explicitly.
@@ -53,19 +55,33 @@ DISCORD_USER_TOKEN=your_user_token_here
 
 ## Usage
 
-### Start DM/Chat interface:
+After running `npm install`, you need to make the command globally available. Run:
 ```bash
-npm run dm
+npm link
+```
+*(On Windows, you might need to run `cmd /c "npm link"` or run PowerShell as Administrator)*
+
+Once linked, you can use the `clicord` command anywhere in your terminal:
+
+### Show Welcome Screen & Quotes:
+```bash
+clicord
 ```
 
-### Start server browser (servers, categories, and channels):
+### Start Unified Interface (DMs and Servers):
 ```bash
-npm run server
+clicord tui
+```
+
+### Start Standalone Interfaces:
+```bash
+clicord dm         # Direct Messages only
+clicord server     # Server browser only
 ```
 
 ### Show Help / Available Commands:
 ```bash
-npm run help
+clicord help
 ```
 
 ## Keyboard Shortcuts

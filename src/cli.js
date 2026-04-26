@@ -1,11 +1,13 @@
 export const program = {
   help: () => {
-    console.log('\nDiscord CLI - Terminal Discord Client\n');
+    console.log('\nclicord - Terminal Discord Client\n');
+    console.log('Usage: clicord <command>\n');
     console.log('Commands:');
-    console.log('  npm run dm          Start Discord chat interface (DMs)');
-    console.log('  npm run server        Start Discord server browser (servers and channels)');
-    console.log('  npm run help       Show this help message');
-    console.log('  npm run -h          Show this help message\n');
+    console.log('  clicord tui        Start unified Discord interface (DMs and Servers)');
+    console.log('  clicord dm         Start standalone Direct Messages interface');
+    console.log('  clicord server     Start standalone Server browser interface');
+    console.log('  clicord help       Show this help message');
+    console.log('  clicord -h         Show this help message\n');
   }
 };
 

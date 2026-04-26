@@ -25,6 +25,11 @@ let mode = 'guilds'; // 'guilds', 'channels', 'chat'
 let replyToMessageId = null;
 let channelLastReadMessage = new Map();
 
+// Fix blessed emoji/wide-char width calculation - adds space after wide characters
+function safeEmoji(text) {
+  if (!text) return '';
+  return text.replace(/([\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{3000}-\u{303F}\u{30A0}-\u{30FF}\u{FF01}-\u{FF60}\u{2300}-\u{23FF}])/gu, '$1 ');
+}
 
 export async function startServer(selectedToken = null) {
   console.log(chalk.cyan('\nStarting Discord Server Browser...\n'));
@@ -47,10 +52,12 @@ export async function startServer(selectedToken = null) {
   });
 
   const screen = blessed.screen({
-    smartCSR: true, // Re-enable smartCSR
-    title: 'Discord CLI',
-    fullUnicode: true // Emoji desteği için
+    smartCSR: true,
+    title: 'clicord',
+    fullUnicode: true,
+    forceUnicode: true
   });
+
 
   const container = blessed.box({
     top: 0,
@@ -67,7 +74,7 @@ export async function startServer(selectedToken = null) {
     left: 0,
     width: '100%',
     height: 3,
-    content: 'DiscordCLI (• Live) / Server Browser',
+    content: 'clicord (• Live) / Server Browser',
     tags: true,
     style: {
       bg: 'black',
@@ -129,7 +136,7 @@ export async function startServer(selectedToken = null) {
     }
   });
 
-  const input = blessed.textbox({
+  const input = blessed.textarea({
     bottom: 3,
     left: 0,
     width: '100%',
@@ -146,6 +153,17 @@ export async function startServer(selectedToken = null) {
     }
   });
 
+  // Enter key submits instead of adding newline
+  input.key('enter', () => {
+    const value = input.getValue().replace(/\n/g, '');
+    input.emit('submit', value);
+  });
+
+  // Hide cursor by default, show only when input has focus
+  screen.program.write('\x1b[?25l');
+  input.on('focus', () => { screen.program.write('\x1b[?25h'); });
+  input.on('blur', () => { screen.program.write('\x1b[?25l'); });
+
   const helpText = blessed.text({
     bottom: 0,
     left: 0,
@@ -154,7 +172,7 @@ export async function startServer(selectedToken = null) {
     content: 'j/k: navigate, Enter: select, Esc: back/quit',
     style: {
       bg: 'black',
-      fg: 'gray'
+      fg: 'grey'
     }
   });
 
@@ -188,7 +206,7 @@ export async function startServer(selectedToken = null) {
       messageList.setScrollPerc(0);
       input.setValue('');
 
-      header.setContent('DiscordCLI (• Live) / Server Browser');
+      header.setContent('clicord (• Live) / Server Browser');
 
       list.show();
       list.setFront(); // Ensure list is on top
@@ -201,7 +219,7 @@ export async function startServer(selectedToken = null) {
       input.setValue('');
 
       header.setContent(
-        `DiscordCLI (• Live) / Server Browser | ${currentGuild ? currentGuild.name : 'Unknown'
+        `clicord (• Live) / Server Browser | ${currentGuild ? currentGuild.name : 'Unknown'
         }${currentChannel ? ` > ${currentChannel.name}` : ''}`
       );
 
@@ -235,11 +253,11 @@ export async function startServer(selectedToken = null) {
       case 'USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_3':
         return '{magenta-fg}★ Sunucuya takviye yaptı!{/magenta-fg}';
       case 'CHANNEL_PINNED_MESSAGE':
-        return '{gray-fg}📌 Bir mesaj sabitledi.{/gray-fg}';
+        return '{white-fg}📌 Bir mesaj sabitledi.{/white-fg}';
       case 'CALL':
         return '{cyan-fg}📞 Bir arama başlattı.{/cyan-fg}';
       case 'CHANNEL_NAME_CHANGE':
-        return '{gray-fg}✏️ Kanal adını değiştirdi.{/gray-fg}';
+        return '{white-fg}✏️ Kanal adını değiştirdi.{/white-fg}';
       case 'RECIPIENT_ADD':
         return '{green-fg}→ Gruba birini ekledi.{/green-fg}';
       case 'RECIPIENT_REMOVE':
@@ -309,7 +327,7 @@ export async function startServer(selectedToken = null) {
           }
         }
         if (embed.footer && embed.footer.text) {
-          content += (content ? '\n' : '') + `{gray-fg}${cleanMessageContent(embed.footer.text)}{/gray-fg}`;
+          content += (content ? '\n' : '') + `{white-fg}${cleanMessageContent(embed.footer.text)}{/white-fg}`;
         }
       }
     }
@@ -395,7 +413,7 @@ export async function startServer(selectedToken = null) {
           }
         } else {
           // Content is already formatted/cleaned by formatMessageContent
-          messageContent = msg.content || '{gray-fg}(empty message){/gray-fg}';
+          messageContent = msg.content || '{white-fg}(empty message){/white-fg}';
         }
 
         if (msg.messageId && deletedMessageIds.has(msg.messageId)) {
@@ -689,7 +707,7 @@ export async function startServer(selectedToken = null) {
             // Add category
             channelsArray.push({
               channel: category,
-              name: `📁 ${category.name || 'Unnamed Category'}`,
+              name: `📁 ${safeEmoji(category.name) || 'Unnamed Category'}`,
               type: 'category'
             });
 
@@ -698,7 +716,7 @@ export async function startServer(selectedToken = null) {
             for (const channel of categoryChannels) {
               channelsArray.push({
                 channel,
-                name: `  # ${channel.name || 'Unnamed'}`,
+                name: `  # ${safeEmoji(channel.name) || 'Unnamed'}`,
                 type: 'guild'
               });
             }
@@ -708,7 +726,7 @@ export async function startServer(selectedToken = null) {
           for (const channel of uncategorizedChannels) {
             channelsArray.push({
               channel,
-              name: `# ${channel.name || 'Unnamed'}`,
+              name: `# ${safeEmoji(channel.name) || 'Unnamed'}`,
               type: 'guild'
             });
           }
@@ -730,7 +748,7 @@ export async function startServer(selectedToken = null) {
 
         currentChannel = selectedChannel.channel;
         const channelName = selectedChannel.name.trim();
-        header.setContent(`DiscordCLI (• Live) / Server Browser | ${currentGuild.name} > ${channelName}`);
+        header.setContent(`clicord (• Live) / Server Browser | ${currentGuild.name} > ${channelName}`);
 
         // Switch to chat mode FIRST to clear screen artifacts
         switchMode('chat');
@@ -1040,7 +1058,7 @@ export async function startServer(selectedToken = null) {
   }
 
   client.once('ready', async () => {
-    const statusText = `DiscordCLI (• Live) / Server Browser`;
+    const statusText = `clicord (• Live) / Server Browser`;
     header.setContent(statusText);
 
     switchMode('guilds');

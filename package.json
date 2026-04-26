@@ -5,13 +5,10 @@
   "main": "index.js",
   "type": "module",
   "bin": {
-    "discord-cli": "./index.js"
+    "clicord": "./index.js"
   },
   "scripts": {
-    "start": "node index.js",
-    "dm": "node index.js dm",
-    "server": "node index.js server",
-    "help": "node index.js --help"
+    "start": "node index.js"
   },
   "keywords": [
     "discord",

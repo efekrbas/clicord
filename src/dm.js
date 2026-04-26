@@ -44,11 +44,27 @@ export async function startChat(selectedToken = null) {
     intents: []
   });
 
+  const globalPresences = new Map();
+  client.ws.on('READY', (data) => {
+    if (data.presences) {
+      data.presences.forEach(p => globalPresences.set(p.user.id, p.status));
+    }
+  });
+  client.ws.on('PRESENCE_UPDATE', (data) => {
+    if (data.user && data.status) {
+      globalPresences.set(data.user.id, data.status);
+      if (typeof updateThreadList === 'function') {
+        try { updateThreadList(); } catch(e) {}
+      }
+    }
+  });
+
   const screen = blessed.screen({
     smartCSR: true,
-    title: 'Discord CLI - DM',
+    title: 'clicord - dm',
     fullUnicode: true
   });
+
 
   const container = blessed.box({
     top: 0,
@@ -65,7 +81,7 @@ export async function startChat(selectedToken = null) {
     left: 0,
     width: '100%',
     height: 3,
-    content: 'DiscordCLI (• Live) / DM',
+    content: 'clicord (• Live) / DM',
     tags: true,
     style: {
       bg: 'black',
@@ -132,7 +148,7 @@ export async function startChat(selectedToken = null) {
     }
   });
 
-  const input = blessed.textbox({
+  const input = blessed.textarea({
     bottom: 3,
     left: 0,
     width: '100%',
@@ -149,6 +165,17 @@ export async function startChat(selectedToken = null) {
     }
   });
 
+  // Enter key submits instead of adding newline
+  input.key('enter', () => {
+    const value = input.getValue().replace(/\n/g, '');
+    input.emit('submit', value);
+  });
+
+  // Hide cursor by default, show only when input has focus
+  screen.program.write('\x1b[?25l');
+  input.on('focus', () => { screen.program.write('\x1b[?25h'); });
+  input.on('blur', () => { screen.program.write('\x1b[?25l'); });
+
   const helpText = blessed.text({
     bottom: 0,
     left: 0,
@@ -157,7 +184,7 @@ export async function startChat(selectedToken = null) {
     content: 'j/k: navigate, Enter: select, Esc: quit',
     style: {
       bg: 'black',
-      fg: 'gray'
+      fg: 'grey'
     }
   });
 
@@ -169,14 +196,41 @@ export async function startChat(selectedToken = null) {
   container.append(input);
   container.append(helpText);
 
+  function getStatusEmoji(user) {
+    if (!user) return '⚪';
+    let status = globalPresences.get(user.id) || user.presence?.status;
+    
+    if (!status) {
+      for (const guild of client.guilds.cache.values()) {
+        const presence = guild.presences.cache.get(user.id);
+        if (presence) {
+          status = presence.status;
+          break;
+        }
+      }
+    }
+
+    if (status === 'online') return '🟢';
+    if (status === 'dnd') return '🔴';
+    if (status === 'idle') return '🟠';
+    return '⚪';
+  }
+
   function switchMode(newMode) {
     mode = newMode;
     if (mode === 'threads') {
+      messageList.setContent('');
+      messageList.setScrollPerc(0);
+      input.clearValue();
       threadList.show();
       messageList.hide();
       input.hide();
       threadList.focus();
       helpText.setContent('j/k: navigate, Enter: select, Esc: quit');
+      
+      if (typeof client !== 'undefined' && client && client.user) {
+        header.setContent(`clicord (• Live) / Chat with ${client.user.username}`);
+      }
     } else if (mode === 'chat') {
       threadList.hide();
       messageList.show();
@@ -184,6 +238,7 @@ export async function startChat(selectedToken = null) {
       input.focus();
       helpText.setContent('Esc: back, Ctrl+D: clear input, /upload <path>: upload file, /view <id>: open file, /reply <id> <msg>: reply, /edit <id> <msg>: edit, /help: commands');
     }
+    screen.alloc();
     screen.render();
   }
 
@@ -209,7 +264,7 @@ export async function startChat(selectedToken = null) {
         } else if (msg.content && msg.content.trim()) {
           messageContent = msg.content;
         } else {
-          messageContent = '{gray-fg}(empty message){/gray-fg}';
+          messageContent = '{white-fg}(empty message){/white-fg}';
         }
 
         // Add "message deleted" if message was deleted
@@ -267,7 +322,7 @@ export async function startChat(selectedToken = null) {
       } else if (content && content.trim()) {
         messageContent = content;
       } else {
-        messageContent = '{gray-fg}(empty message){/gray-fg}';
+        messageContent = '{white-fg}(empty message){/white-fg}';
       }
 
       let replyInfo = '';
@@ -350,6 +405,21 @@ export async function startChat(selectedToken = null) {
         // Handle system messages if content is empty
         if (!content && !hasSticker && msg.type !== 'DEFAULT' && msg.type !== 'REPLY') {
           content = getSystemMessageEventText(msg);
+        }
+
+        if (msg.embeds && msg.embeds.length > 0) {
+          for (const embed of msg.embeds) {
+            if (embed.title) content += (content ? '\n' : '') + `{yellow-fg}${cleanPreview(embed.title)}{/yellow-fg}`;
+            if (embed.description) content += (content ? '\n' : '') + cleanPreview(embed.description);
+            if (embed.fields && embed.fields.length > 0) {
+              for (const field of embed.fields) {
+                content += (content ? '\n' : '') + `{cyan-fg}${cleanPreview(field.name)}:{/cyan-fg} ${cleanPreview(field.value)}`;
+              }
+            }
+            if (embed.footer && embed.footer.text) {
+              content += (content ? '\n' : '') + `{white-fg}${cleanPreview(embed.footer.text)}{/white-fg}`;
+            }
+          }
         }
 
         addMessage(
@@ -439,6 +509,25 @@ export async function startChat(selectedToken = null) {
     }
   }
 
+  function cleanPreview(text) {
+    if (!text) return '';
+    let cleaned = text
+      .replace(/<@!?(\d+)>/g, (match, id) => {
+        const user = client.users.cache.get(id);
+        return user ? `@${formatAuthor(user)}` : '@user';
+      })
+      .replace(/<#(\d+)>/g, (match, id) => {
+        const ch = client.channels.cache.get(id);
+        return ch ? `#${ch.name}` : '#channel';
+      })
+      .replace(/<@&(\d+)>/g, '@role')
+      .replace(/<:(\w+):\d+>/g, ':$1:')
+      .replace(/<a:(\w+):\d+>/g, ':$1:');
+    // Escape { } to prevent blessed tag corruption
+    cleaned = cleaned.replace(/\{/g, '\\{').replace(/\}/g, '\\}');
+    return cleaned;
+  }
+
   function updateThreadList(selectedIndexOverride = null) {
     const currentSelected = selectedIndexOverride !== null ? selectedIndexOverride : (threadList.selected >= 0 ? threadList.selected : 0);
     const targetIdx = currentSelected < channels.length ? currentSelected : 0;
@@ -448,23 +537,14 @@ export async function startChat(selectedToken = null) {
       // Create yellow cursor for selected item
       const prefix = idx === targetIdx ? '{yellow-fg}>{/yellow-fg} ' : '  ';
 
-      let preview = '';
-      try {
-        const lastMsg = ch.channel.lastMessage;
-        if (lastMsg) {
-          preview = lastMsg.content ? lastMsg.content.substring(0, 50) : '[Media]';
-          if (preview.length < lastMsg.content?.length) preview += '...';
-        }
-      } catch (e) {
-        preview = '';
-      }
-
-      // Combine prefix, name and preview
+      // Combine prefix, name and unread badge
+      // Escape { } in name to prevent blessed tag corruption
+      const safeName = ch.type === 'group' ? ch.name : ch.name.replace(/\{/g, '\\{').replace(/\}/g, '\\}');
       const channelId = ch.channel.id;
       const unreadCount = unreadCounts.get(channelId) || 0;
       const unreadStr = unreadCount > 0 ? ` {red-fg}(${unreadCount} New){/red-fg}` : '';
 
-      return `${prefix}${ch.name}${preview ? ' | ' + preview : ''}${unreadStr}`;
+      return `${prefix}${safeName}${unreadStr}`;
     });
 
     // Update items directly to preserve scroll state
@@ -534,7 +614,7 @@ export async function startChat(selectedToken = null) {
       updateThreadList();
 
       const channelName = selectedChannel.name;
-      header.setContent(`DiscordCLI (• Live) / Chat with ${client.user.username} | ${channelName}`);
+      header.setContent(`clicord (• Live) / Chat with ${client.user.username} | ${channelName}`);
 
       await loadChannelMessages(currentChannel);
       switchMode('chat');
@@ -542,7 +622,7 @@ export async function startChat(selectedToken = null) {
   });
 
   client.once('ready', async () => {
-    const statusText = `DiscordCLI (• Live) / Chat with ${client.user.username}`;
+    const statusText = `clicord (• Live) / Chat with ${client.user.username}`;
     header.setContent(statusText);
 
     switchMode('threads');
@@ -578,7 +658,7 @@ export async function startChat(selectedToken = null) {
 
             channels.push({
               channel,
-              name: `{blue-fg}Grup{/blue-fg}: ${groupName}`,
+              name: `👥 ${groupName}`,
               type: 'group'
             });
           }
@@ -591,7 +671,8 @@ export async function startChat(selectedToken = null) {
             let recipientName = 'Unknown';
             const recipient = channel.recipient || (channel.recipients && channel.recipients.first());
             if (recipient) {
-              recipientName = formatAuthor(recipient);
+              const statusEmoji = getStatusEmoji(recipient);
+              recipientName = `${statusEmoji} ${formatAuthor(recipient)}`;
             }
 
             channels.push({
@@ -666,6 +747,21 @@ export async function startChat(selectedToken = null) {
         // Handle system messages if content is empty
         if (!content && !hasSticker && message.type !== 'DEFAULT' && message.type !== 'REPLY') {
           content = getSystemMessageEventText(message);
+        }
+
+        if (message.embeds && message.embeds.length > 0) {
+          for (const embed of message.embeds) {
+            if (embed.title) content += (content ? '\n' : '') + `{yellow-fg}${cleanPreview(embed.title)}{/yellow-fg}`;
+            if (embed.description) content += (content ? '\n' : '') + cleanPreview(embed.description);
+            if (embed.fields && embed.fields.length > 0) {
+              for (const field of embed.fields) {
+                content += (content ? '\n' : '') + `{cyan-fg}${cleanPreview(field.name)}:{/cyan-fg} ${cleanPreview(field.value)}`;
+              }
+            }
+            if (embed.footer && embed.footer.text) {
+              content += (content ? '\n' : '') + `{white-fg}${cleanPreview(embed.footer.text)}{/white-fg}`;
+            }
+          }
         }
 
         addMessage(
