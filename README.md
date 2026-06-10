@@ -38,6 +38,9 @@ npm install
 - If you suspect your token is compromised, change your Discord password immediately to reset it.
 - *Disclaimer: Using self-bots may be prohibited under Discord's Terms of Service. Use this application at your own risk.*
 
+**🛡️ Anti-Virus False Positives:**
+Some antivirus programs or Windows Defender may flag this project as a virus or malicious software. This is a **false positive**. Because `clicord` automatically scans your local Discord installation files to extract your login token for seamless authentication, security software may mistake this behavior for a token logger or malware. The source code is completely open and transparent, and you are encouraged to review it yourself.
+
 ## Usage
 
 After running `npm install`, you need to make the command globally available. Run:
